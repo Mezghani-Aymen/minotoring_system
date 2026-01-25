@@ -90,6 +90,8 @@ def merge_values(existing, incoming):
                 break
         else:
             existing.append({
+                "monitor": new.get("monitor"),
+                "primary": new.get("primary"),
                 "application": app,
                 "topic": topic,
                 "timestamps": [ts]
