@@ -21,29 +21,33 @@ def parse_log_interaction(interaction: str, schema: list = INTERACTION_SCHEMA):
     return data
 
 
-def parse_log_line(interaction, monitor):
-    date, timestamp, application, context, topic = interaction
-    device , primary= monitor
+def parse_log_line(interaction_info, monitor_info):
 
-    return {
+    interaction_data = {}
+    for key in INTERACTION_SCHEMA:
+        interaction_data[key] = interaction_info.get(key)
+
+    if "extra" in interaction_info:
+        interaction_data["extra"] = interaction_info["extra"]
+
+    date = interaction_data.get("date")
+
+    return  {
         date: [
             {
-                "context": context,
+                "context": interaction_data.get("context"),
                 "value": [
                     {
-                        "monitor": device,
-                        "primary": primary,
-                        "timestamp": timestamp,
-                        "application": application,
-                        "topic": topic,
-                        # TODO: implement total_time key ! 
-                        # "total_time": total_time(date, application, topic, timestamp)
+                        "timestamp": interaction_data.get("timestamp"),
+                        "application": interaction_data.get("application"),
+                        "topic": interaction_data.get("topic"),
+                        "monitor": monitor_info[0],
+                        "primary": monitor_info[1]
                     }
                 ]
             }
         ]
     }
-
 
 
 def extract_date_and_activities(data):
