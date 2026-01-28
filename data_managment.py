@@ -20,8 +20,6 @@ def parse_log_interaction(interaction: str, schema: list = INTERACTION_SCHEMA):
         data["context"] = data["raw_context"].split(".", 1)[0]
         del data["raw_context"]
 
-    with open('output.txt', 'a') as file:
-        file.write(str(data))
     return data
 
 
