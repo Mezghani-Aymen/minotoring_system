@@ -16,9 +16,7 @@ def parse_log_interaction(interaction: str, schema: list = INTERACTION_SCHEMA):
     if len(parts) > len(schema):
         data["extra"] = parts[len(schema):]
 
-    if data.get("raw_context"):
-        data["context"] = data["raw_context"].split(".", 1)[0]
-        del data["raw_context"]
+    data["context"] = data["context"].split(".", 1)[0]
 
     return data
 
