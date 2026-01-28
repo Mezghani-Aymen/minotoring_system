@@ -6,16 +6,21 @@ from window_utils import get_foreground_hwnd
 # TODO: Add mousse tracing / AFK detection
 
 def parse_window_title(hwnd):
-    title = win32gui.GetWindowText(hwnd).split()
-    print ('title: ' + title)
-    topic_name = title[0]
-    program_name = ' '.join(title[-3:])
+    raw_title = win32gui.GetWindowText(hwnd)
+
+    if not raw_title or raw_title == "Program Manager":
+        return "Desktop", "Desktop"
+
+    parts = raw_title.split()
+
+    topic_name = parts[0]
+    program_name = " ".join(parts[-3:]) if len(parts) >= 3 else raw_title
 
     return program_name, topic_name
 
+
 def collect_active_window_log():
     hwnd = get_foreground_hwnd()
-    print ("hwnd: " + str(hwnd))
     if not hwnd:
         return None
 
