@@ -1,13 +1,28 @@
-def parse_log_interaction(interaction):
-    # TODO: validate parts length
-    # TODO: handle parts dynamically
-    parts = [p.strip() for p in interaction.split(" - ") if p.strip()]
-    if len(parts) < 5:
+from config import INTERACTION_SCHEMA
+
+def parse_log_interaction(interaction: str, schema: list = INTERACTION_SCHEMA):
+
+    if not interaction or not isinstance(interaction, str):
         return None
 
-    date, timestamp, application, raw_context, topic = parts[:5]
-    context = raw_context.split(".", 1)[0]
-    return date, timestamp, application, context, topic
+    parts = [p.strip() for p in interaction.split(" - ") if p.strip()]
+
+    if len(parts) < len(schema):
+        parts = parts + [None] * (len(schema) - len(parts))
+
+    values = parts[:len(schema)]
+    data = dict(zip(schema, values))
+
+    if len(parts) > len(schema):
+        data["extra"] = parts[len(schema):]
+
+    if data.get("raw_context"):
+        data["context"] = data["raw_context"].split(".", 1)[0]
+        del data["raw_context"]
+
+    with open('output.txt', 'a') as file:
+        file.write(str(data))
+    return data
 
 
 def parse_log_line(interaction, monitor):
