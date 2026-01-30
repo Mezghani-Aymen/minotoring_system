@@ -1,9 +1,35 @@
+import ctypes
 import win32gui, win32process, psutil
+from config import AFK_THRESHOLD_SECONDS
 from date import current_date, current_time
 from window_utils import get_foreground_hwnd
 
 
-# TODO: Add mousse tracing / AFK detection
+def check_user_activity():
+    idle_seconds = get_afk_time_seconds()
+
+    if idle_seconds >= AFK_THRESHOLD_SECONDS:
+        return True
+
+    return False
+
+
+def get_afk_time_seconds():
+    class _LASTINPUTINFO(ctypes.Structure):
+        _fields_ = [
+            ("cbSize", ctypes.c_uint),
+            ("dwTime", ctypes.c_uint),
+        ]
+
+    info = _LASTINPUTINFO()
+    info.cbSize = ctypes.sizeof(_LASTINPUTINFO)
+
+    if ctypes.windll.user32.GetLastInputInfo(ctypes.byref(info)):
+        millis = ctypes.windll.kernel32.GetTickCount() - info.dwTime
+        return int(millis / 1000)
+
+    return 0
+
 
 def parse_window_title(hwnd):
     raw_title = win32gui.GetWindowText(hwnd)
