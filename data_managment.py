@@ -27,9 +27,6 @@ def parse_log_line(interaction_info, monitor_info):
     for key in INTERACTION_SCHEMA:
         interaction_data[key] = interaction_info.get(key)
 
-    if "extra" in interaction_info:
-        interaction_data["extra"] = interaction_info["extra"]
-
     date = interaction_data.get("date")
 
     return  {
@@ -42,7 +39,8 @@ def parse_log_line(interaction_info, monitor_info):
                         "application": interaction_data.get("application"),
                         "topic": interaction_data.get("topic"),
                         "monitor": monitor_info[0],
-                        "primary": monitor_info[1]
+                        "primary": monitor_info[1],
+                        "extra": interaction_data.get("extra") or []
                     }
                 ]
             }
