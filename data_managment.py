@@ -72,10 +72,13 @@ def merge_activities(activities, new_activities):
     for new_act in new_activities:
         context = new_act["context"]
         values = new_act["value"]
+        extra = new_act.get("extra") 
 
         for act in activities:
             if act["context"] == context:
                 merge_values(act["value"], values)
+                if extra:
+                    act.setdefault("extra", []).extend(extra)
                 break
         else:
             normalize_timestamps(values)
@@ -93,15 +96,15 @@ def merge_values(existing, incoming):
         app = new["application"]
         topic = new["topic"]
         ts = new["timestamp"]
+        extra = new.get("extra")
 
         for exist in existing:
             if exist["application"] == app and exist["topic"] == topic:
-                # add timestamp only if it doesn't exist
                 if ts not in exist["timestamps"]:
                     exist["timestamps"].append(ts)
-
-                # keep timestamps sorted
                 exist["timestamps"].sort()
+                if extra:
+                    exist.setdefault("extra", []).extend(extra)
                 break
         else:
             existing.append({
@@ -109,7 +112,8 @@ def merge_values(existing, incoming):
                 "primary": new.get("primary"),
                 "application": app,
                 "topic": topic,
-                "timestamps": [ts]
+                "timestamps": [ts],
+                "extra": extra or []
             })
 
 
