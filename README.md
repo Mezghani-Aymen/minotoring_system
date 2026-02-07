@@ -117,7 +117,7 @@ No scoring, judgment, or enforcement in this phase.
 
 ### Desktop UI
 
-* React + TypeScript
+* Next + TypeScript
 * Packaged with Tauri
 
 ### Distribution
