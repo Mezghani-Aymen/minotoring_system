@@ -1,6 +1,6 @@
 import json
 from app.core.activity_processing import extract_date_and_activities, date_entry_managment, merge_activities
-from app.core.time_utils import compute_activities_time
+from utils.time_utils import compute_activities_time
 
 def save_json_array(arr, file_path):
     arr.sort(key=lambda x: next(iter(x)))
