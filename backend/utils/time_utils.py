@@ -1,16 +1,31 @@
 from datetime import datetime
 from app.config.settings import IDLE_THRESHOLD_SECONDS
 
-def current_datetime():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+def now(format = "object"):
+    currentDateTime= datetime.now()
+
+    if format == "string":
+        return currentDateTime.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        return currentDateTime
 
 
-def current_date():
-    return datetime.now().strftime("%Y-%m-%d")
+def current_date(format = "object"):
+    currentDate = now("object").date()
+
+    if format =="string":
+        return currentDate.strftime("%Y-%m-%d")
+    else:
+        return currentDate
 
 
-def current_time():
-    return datetime.now().strftime("%H:%M:%S")
+def current_time(format = "object"):
+    currentTime = now("object").time()
+    if format =="string":
+        return currentTime.strftime("%H:%M:%S")
+    else:
+        return currentTime
+
 
 
 def calculate_active_time(timestamps, idle_threshold=IDLE_THRESHOLD_SECONDS):
@@ -34,12 +49,14 @@ def calculate_active_time(timestamps, idle_threshold=IDLE_THRESHOLD_SECONDS):
     sessions.append(current_session)
     return sessions, int(sum(sessions))
 
+
 def seconds_to_hms(total_seconds):
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
     seconds = total_seconds % 60
 
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
+
 
 def compute_activities_time(activities, idle_threshold=IDLE_THRESHOLD_SECONDS):
     """
@@ -54,5 +71,4 @@ def compute_activities_time(activities, idle_threshold=IDLE_THRESHOLD_SECONDS):
                 timestamps,
                 idle_threshold
             )
-            # TODO: every 60 seconds remove 60 lines from timestamps to avoid memory overload
             value["total_time"] = seconds_to_hms(total_seconds)
