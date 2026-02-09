@@ -54,6 +54,6 @@ def collect_active_window_log():
     _, pid = win32process.GetWindowThreadProcessId(hwnd)
 
     process_name = psutil.Process(pid).name()
-    log_line = f"{current_date()} - {current_time()} - {window_title} - {process_name} - {topic_name}"
+    log_line = f"{current_date("string")} - {current_time("string")} - {window_title} - {process_name} - {topic_name}"
 
     return log_line
