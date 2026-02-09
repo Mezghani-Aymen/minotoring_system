@@ -1,6 +1,6 @@
 import time
-from app.config.settings import INTERVAL
-from app.core.activity_processing import parse_log_line, parse_log_interaction , parse_log_monitor
+from app.config.settings import AFK_ALERT_SHOWN, INTERVAL
+from app.core.activity_processing import parse_log_line, parse_log_interaction , parse_log_monitor ,aggregated_log_line
 from app.storage.json_repository import add_log_line
 from app.infrastructure.monitor_detector import get_window_monitor
 from app.infrastructure.activity_collector import check_user_activity, collect_active_window_log
@@ -28,6 +28,8 @@ if __name__ == "__main__":
             AFK_status= check_user_activity()
 
             if not AFK_status:
+                AFK_ALERT_SHOWN = True
+
                 monitor_info = get_window_monitor()
                 interaction = collect_active_window_log()
 
@@ -51,8 +53,9 @@ if __name__ == "__main__":
                 # filter_json(RESULTS_FILE)
                 time.sleep(INTERVAL)
             else :
-                notify("Monitoring System Stoped", "User is AFK!")
-                # raise Exception("User is AFK!")
+               if not AFK_ALERT_SHOWN:
+                notify("Monitoring System Stopped", "User is AFK!")
+                AFK_ALERT_SHOWN = True
             
     except Exception as e:
         notify("Monitoring System Stoped", f"An error occurred: {e}")
