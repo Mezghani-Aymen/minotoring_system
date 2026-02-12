@@ -1,10 +1,10 @@
 import time
 from app.config.settings import AFK_ALERT_SHOWN, INTERVAL
 from app.core.activity_processing import parse_log_line, parse_log_interaction , parse_log_monitor
-from app.storage.json_repository import  add_log_line 
+from app.storage.json_repository import  add_log_line ,add_aggregated_data
 from app.infrastructure.monitor_detector import get_window_monitor
 from app.infrastructure.activity_collector import check_user_activity, collect_active_window_log
-from utils.time_utils import current_date
+from utils.date_utils import get_previous_day, current_date
 from utils.file_name_utils import get_filename
 from services.notification import notify
 
@@ -20,19 +20,28 @@ if __name__ == "__main__":
     # TODO: Add notifications and alerts for user about productivity , time spent on certain apps/websites etc.
     # TODO: [Part league of legends] Add detection when user is in champion select / in game / in lobby etc. [optional].
 
-    date = current_date() 
-
     try:
-        
-        RAW_FILE=get_filename('raw',date)
-        AGGREGATED_FILE=get_filename('aggregated',date)
+
+        date = current_date()
+        RAW_FILE = get_filename("raw", date)
 
         while True:
+
+            new_date = current_date()
+            if new_date != date:
+
+                previous_raw_file = RAW_FILE
+                aggregated_file = get_filename("aggregated", date)
+
+                add_aggregated_data(previous_raw_file, aggregated_file)
+
+                date = new_date
+                RAW_FILE = get_filename("raw", date)
 
             AFK_status= check_user_activity()
 
             if not AFK_status:
-                AFK_ALERT_SHOWN = True
+                AFK_ALERT_SHOWN = False 
 
                 monitor_info = get_window_monitor()
                 interaction = collect_active_window_log()
