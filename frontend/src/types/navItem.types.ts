@@ -1,6 +1,6 @@
 export type NavItem = {
     name: string;
-    icon: React.ReactNode;
+    icon: React.ElementType;
     path?: string;
     subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
