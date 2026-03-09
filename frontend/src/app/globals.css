@@ -2,7 +2,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 @theme {
   --font-*: initial;
   --font-outfit: Outfit, sans-serif;
@@ -168,8 +167,15 @@
   --z-index-999999: 999999;
 }
 
-@layer base {
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
   *,
   ::after,
   ::before,
@@ -177,13 +183,59 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
-
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-
   body {
     @apply relative font-normal font-outfit z-1 bg-gray-50;
   }
+}
+
+@utility menu-item {
+  @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-theme-sm;
+}
+
+@utility menu-item-active {
+  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+}
+
+@utility menu-item-inactive {
+  @apply text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300;
+}
+
+/* third-party libraries CSS */
+.apexcharts-legend-text {
+  @apply !text-gray-700 dark:!text-gray-400;
+}
+
+.apexcharts-text {
+  @apply !fill-gray-700 dark:!fill-gray-400;
+}
+
+.apexcharts-tooltip.apexcharts-theme-light {
+  @apply gap-1 !rounded-lg !border-gray-200 p-3 !shadow-theme-sm dark:!border-gray-800 dark:!bg-gray-900;
+}
+
+.apexcharts-legend-text {
+  @apply pl-5! !text-gray-700 dark:!text-gray-400;
+}
+.apexcharts-tooltip-series-group {
+  @apply !p-0;
+}
+.apexcharts-tooltip-y-group {
+  @apply !p-0;
+}
+.apexcharts-tooltip-title {
+  @apply !mb-0 !border-b-0 !bg-transparent !p-0 !text-[10px] !leading-4 !text-gray-800 dark:!text-white/90;
+}
+.apexcharts-tooltip-text {
+  @apply !text-theme-xs !text-gray-700 dark:!text-white/90;
+}
+.apexcharts-tooltip-text-y-value {
+  @apply !font-medium;
+}
+
+.apexcharts-gridline {
+  @apply !stroke-gray-100 dark:!stroke-gray-800;
 }
