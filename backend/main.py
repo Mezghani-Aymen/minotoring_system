@@ -1,5 +1,5 @@
 import time
-from app.config.settings import AFK_ALERT_SHOWN, INTERVAL
+from app.config.settings import AFK_ALERT_SHOWN, RAW_FILE_PATH, INTERVAL, AGGREGATED_FILE_PATH
 from app.core.activity_processing import parse_log_line, parse_log_interaction , parse_log_monitor
 from app.storage.json_repository import  add_log_line ,add_aggregated_data
 from app.infrastructure.monitor_detector import get_window_monitor
@@ -20,20 +20,20 @@ if __name__ == "__main__":
     # TODO: Add notifications and alerts for user about productivity , time spent on certain apps/websites etc.
     # TODO: [Part league of legends] Add detection when user is in champion select / in game / in lobby etc. [optional].
 
-    try:
+    while True:
+        
+        try:
 
-        date = current_date()
-        RAW_FILE = get_filename("raw", date)
-
-        while True:
-
+            date = current_date()
+            RAW_FILE = RAW_FILE_PATH + get_filename("raw", date)
             new_date = current_date()
             if new_date != date:
 
                 previous_raw_file = RAW_FILE
-                aggregated_file = get_filename("aggregated", date)
 
-                add_aggregated_data(previous_raw_file, aggregated_file)
+                AGGREGATED_FILE = AGGREGATED_FILE_PATH + get_filename("aggregated", date)
+
+                add_aggregated_data(previous_raw_file, AGGREGATED_FILE)
 
                 date = new_date
                 RAW_FILE = get_filename("raw", date)
@@ -68,6 +68,6 @@ if __name__ == "__main__":
                if not AFK_ALERT_SHOWN:
                 notify("Monitoring System Stopped", "User is AFK!")
                 AFK_ALERT_SHOWN = True
-            
-    except Exception as e:
-        notify("Monitoring System Stoped", f"An error occurred: {e}")
+                
+        except Exception as e:
+            notify("Monitoring System Stoped", f"An error occurred: {e}")
