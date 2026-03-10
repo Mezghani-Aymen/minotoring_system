@@ -5,7 +5,8 @@ INTERACTION_SCHEMA = ["date", "timestamp", "application", "context" , "topic"]
 OPTIMIZIED_ATTRIBUTES_SCHEMA = ["date", "total_time", "application", "context" , "monitor"]
 MERGED_ATTRIBUTES_SCHEMA = ["date", "total_time", "application", "context" , "monitor","topic","extra","primary"]
 AFK_ALERT_SHOWN = False
-
+RAW_FILE_PATH = "./data/raw/"
+AGGREGATED_FILE_PATH = "./data/aggregated/"
 # ATTRIBUTES_SCHEMA = {
 #     "date": "date",
 #     "context": "context",
