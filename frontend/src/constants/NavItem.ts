@@ -1,7 +1,7 @@
 import { NavItem } from "@/types/navItem.types";
 import {
   GridIcon,
-  CalenderIcon
+  Settings
 } from "@/icons";
 
 export const navItems: NavItem[] = [
@@ -11,8 +11,8 @@ export const navItems: NavItem[] = [
     path: "/dashboard",
   },
   {
-    icon: CalenderIcon,
-    name: "Calendar",
-    path: "/calendar",
+    icon: Settings,
+    name: "Settings",
+    path: "/settings",
   }
 ];
