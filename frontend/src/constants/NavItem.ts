@@ -8,11 +8,11 @@ export const navItems: NavItem[] = [
   {
     icon: GridIcon,
     name: "Dashboard",
-    path: "/dashboard",
+    path: "/",
   },
   {
     icon: Settings,
     name: "Settings",
-    path: "/settings",
+    subItems: [{ name: "General", path: "/settings/general" }, { name: "Notification", path: "/settings/notification" }],
   }
 ];
