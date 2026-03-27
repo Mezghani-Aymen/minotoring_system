@@ -7,8 +7,8 @@ interface MetricItemProps {
   title: string;
   value: string | number;
   icon: React.ReactNode;
-  trend: "up" | "down";
-  percentage: string;
+  trend?: "up" | "down";
+  percentage?: string;
 }
 
 export const MetricItem: React.FC<MetricItemProps> = ({
@@ -36,14 +36,16 @@ export const MetricItem: React.FC<MetricItemProps> = ({
           </h4>
         </div>
 
-        <Badge color={isUp ? "success" : "error"}>
-          {isUp ? (
-            <ArrowUpIcon />
-          ) : (
-            <ArrowDownIcon className="text-error-500" />
-          )}
-          {percentage}
-        </Badge>
+        {trend && percentage && (
+          <Badge color={isUp ? "success" : "error"}>
+            {isUp ? (
+              <ArrowUpIcon />
+            ) : (
+              <ArrowDownIcon className="text-error-500" />
+            )}
+            {percentage}
+          </Badge>
+        )}
       </div>
     </div>
   );
