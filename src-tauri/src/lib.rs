@@ -12,7 +12,8 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![
             theme::switch_theme,
-            data_service::fetch_aggregated_data
+            data_service::fetch_aggregated_data,
+            python_commands::run_python,
         ])
         .setup(|app| {
             use tauri_plugin_notification::NotificationExt;
