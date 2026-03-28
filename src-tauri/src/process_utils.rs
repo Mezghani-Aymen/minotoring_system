@@ -1,4 +1,4 @@
-use std::process::Child;
+use std::process::{Child, Command};
 
 pub fn check_and_cleanup_process(lock: &mut Option<Child>) -> bool {
     if let Some(child) = lock.as_mut() {
@@ -14,4 +14,8 @@ pub fn check_and_cleanup_process(lock: &mut Option<Child>) -> bool {
     } else {
         false // Nothing was ever running
     }
+}
+
+fn spawn_process(cmd: &mut Command) -> Result<Child, String> {
+    cmd.spawn().map_err(|e| format!("Failed to spawn process: {}", e))
 }
