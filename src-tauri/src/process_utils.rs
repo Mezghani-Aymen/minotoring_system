@@ -30,7 +30,7 @@ pub fn store_process(state: &State<'_, PythonState>, child: Child) {
 
 pub fn build_command(app: &AppHandle, is_dev: bool) -> Result<Command, String> {
     if is_dev {
-        let mut cmd = Command::new("py");
+        let mut cmd = Command::new("python");
         cmd.arg("../backend/main.py");
         Ok(cmd)
     } else {
