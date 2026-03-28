@@ -1,9 +1,9 @@
 #[tauri::command]
 pub fn fetch_aggregated_data(app: tauri::AppHandle, date: String) -> Result<String, String> {
-    use crate::python_commands;
+    use crate::file_utils;
     use std::fs;
 
-    let base_path = python_commands::get_base_path(&app)?;
+    let base_path = file_utils::get_base_path(&app)?;
     let mut path = base_path.join("aggregated");
 
     path.push(format!("aggregated_{}.json", date));
