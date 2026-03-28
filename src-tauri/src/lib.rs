@@ -16,6 +16,9 @@ pub fn run() {
             python_commands::run_python,
             python_commands::is_python_running
         ])
+        .manage(python_commands::PythonState {
+            child: std::sync::Mutex::new(None),
+        })
         .setup(|app| {
             use tauri_plugin_notification::NotificationExt;
             app.notification()
