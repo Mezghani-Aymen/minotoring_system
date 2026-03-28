@@ -14,6 +14,7 @@ pub fn run() {
             theme::switch_theme,
             data_service::fetch_aggregated_data,
             python_commands::run_python,
+            python_commands::is_python_running
         ])
         .setup(|app| {
             use tauri_plugin_notification::NotificationExt;
