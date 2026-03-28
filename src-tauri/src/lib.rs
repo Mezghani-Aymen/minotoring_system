@@ -10,7 +10,10 @@ pub fn run() {
     // TODO: Add stop tracking when i close app.
     tauri::Builder::default()
         .plugin(tauri_plugin_notification::init())
-        .invoke_handler(tauri::generate_handler![theme::switch_theme])
+        .invoke_handler(tauri::generate_handler![
+            theme::switch_theme,
+            data_service::fetch_aggregated_data
+        ])
         .setup(|app| {
             use tauri_plugin_notification::NotificationExt;
             app.notification()
