@@ -1,6 +1,6 @@
-use std::process::{Child, Command};
-use tauri::State;
 use crate::python_commands::PythonState;
+use std::process::{Child, Command};
+use tauri::{AppHandle, Manager, State};
 
 pub fn check_and_cleanup_process(lock: &mut Option<Child>) -> bool {
     if let Some(child) = lock.as_mut() {
@@ -26,4 +26,19 @@ pub fn spawn_process(cmd: &mut Command) -> Result<Child, String> {
 pub fn store_process(state: &State<'_, PythonState>, child: Child) {
     let mut lock = state.child.lock().unwrap();
     *lock = Some(child);
+}
+
+pub fn build_command(app: &AppHandle, is_dev: bool) -> Result<Command, String> {
+    if is_dev {
+        let mut cmd = Command::new("py");
+        cmd.arg("../backend/main.py");
+        Ok(cmd)
+    } else {
+        let exe_path = app
+            .path()
+            .resolve("backend/main.exe", tauri::path::BaseDirectory::Resource)
+            .map_err(|e| e.to_string())?;
+
+        Ok(Command::new(exe_path))
+    }
 }
