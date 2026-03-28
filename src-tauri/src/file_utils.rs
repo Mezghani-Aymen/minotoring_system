@@ -15,3 +15,9 @@ pub fn prepare_paths(base_path: &PathBuf) -> (PathBuf, PathBuf) {
     let aggregated = base_path.join("aggregated/");
     (raw, aggregated)
 }
+
+pub fn ensure_directories(raw: &PathBuf, aggregated: &PathBuf) -> Result<(), String> {
+    std::fs::create_dir_all(raw).map_err(|e| e.to_string())?;
+    std::fs::create_dir_all(aggregated).map_err(|e| e.to_string())?;
+    Ok(())
+}
