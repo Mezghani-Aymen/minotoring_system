@@ -1,162 +1,56 @@
-# Small Product — User Activity Monitoring (No AI Yet)
+# Apex Trace — User Activity Monitoring
 
-## Purpose
+## 1. What We Do (Current Capabilities)
+Build a **local-first desktop application** that monitors user activity on a Windows PC to provide **truthful, analyzable data** about how the computer is used. It acts as an observation-only foundation.
 
-Build a **local-first desktop application** that monitors user activity on a Windows PC to provide **truthful, analyzable data** about how the computer is used. This phase contains **no AI and no enforcement**. It is observation only.
-
-The product is a foundation for later AI-based skill analysis and discipline enforcement.
-
----
-
-## Core Goals
-
-* Monitor **OS-level user activity**
-* Classify activities by **type** (browser, folder, editor, games, files, etc.)
-* Measure **time and interaction**, not just presence
-* Store data **locally** and privately
-* Provide a **dashboard** for analysis
-* Be safe, reversible, and non-destructive
-
----
-
-## What Is Tracked
-
-### Application Events
-
-* Application opened
-* Application closed
-* Foreground (active window) and background changes  
-
-### Application Types
-
-Each application is classified into a type:
-
-* Browser
-* Folder (File Explorer)
-* Editor / IDE
-* Game
-* File viewer
-* Other
-
-### Time Metrics
-
-* Foreground duration per app
-* Total duration per app type
-* Idle time
-* Background duraction per app
-
-### Interaction Metrics
-
-* Keyboard activity (signal only, no content)
-* Mouse activity (signal only)
-* Interaction-weighted time
-
-Example:
-
-* Browser open 20 min, high interaction
-* Folder open 20 min, low interaction
-  → Browser is considered dominant activity
+### Core Tracking & Processing:
+* **OS-Level Activity Monitoring**: Captures active applications, foreground/background window changes, and Idle/AFK states.
+* **Interaction Metrics**: Tracks keyboard/mouse signal presence to weight active vs passive usage (e.g., active browsing vs leaving an app open in the background).
+* **Data Aggregation Architecture**: 
+  - Raw JSON logs act as the source of truth (highly detailed, rotated daily).
+  - Background daily aggregation processes summarize raw data into lightweight, UI-ready metrics.
+* **Desktop Dashboard (MVP)**:
+  - Built with **Next.js + Tauri** fetching aggregated JSON data via secure native Rust IPC.
+  - Displays **Weekly Activity charts**, **Tracked Time** summaries, and **Daily Uptime Targets**.
+  - Includes user settings interface (General, Notifications) aligned to the brand aesthetic.
+* **Privacy & Safety First**: 
+  - 100% Local-only data storage. No network uploads.
+  - Non-destructive and entirely reversible.
 
 ---
 
-## Data Processing
-
-### Aggregation
-
-* Time per application
-* Interaction vs passive time
-* App-switch timeline (A → Z)
-
-### Filtering
-
-* By date
-* By time range
-* By application type
+## 2. What We Don't Do (Yet)
+This phase establishes **ground truth data** only. Currently, the system explicitly **does NOT**:
+* **Use AI Analysis**: There is no machine learning or intelligence scoring occurring.
+* **Enforce Discipline**: The app will not block your usage, close your games, or force you to work.
+* **Log Key Content**: We do not log the actual keys pressed or text typed (only the signal that a keystroke occurred).
+* **Upload to Cloud**: There is no remote dashboard or cloud syncing.
 
 ---
 
-## Dashboard (MVP)
+## 3. Features That Will Be Implemented (Roadmap)
+Based on current backend architecture plans, the following features will be integrated in later phases:
 
-### Views
+### Productivity & Enforcements
+* **Productivity Detection & Analysis**: Categorize and score the efficiency of time spent.
+* **Access Control & App Blocking**: Firewall rules or process execution blocking to prevent access to certain apps/websites during focus periods.
+* **Time-Limit Enforcement**: Automatically closing applications when they are used for too much time (e.g., closing League of Legends after 2 hours and blocking it for 24H).
 
-1. **Timeline View**
+### Enhanced Monitoring
+* **Background Content Tracking**: Monitor specific media details like YouTube videos playing or Music players.
+* **Game-Specific Detection**: Deep integration to detect when a user is in Champion Select, In-Game, or in Lobby (e.g., League of Legends).
+* **Granular Logging**: More detailed raw logging of exact keystrokes, mouse movements, and application clicks.
 
-   * Sequential app usage (A → Z)
-
-2. **Grouped Statistics**
-
-   * Time by app
-   * Time by type
-
-3. **Interaction Analysis**
-
-   * Active vs passive usage
-
-4. **Daily Summary**
-
-   * Focus-heavy vs distraction-heavy periods
-
-No scoring, judgment, or enforcement in this phase.
+### AI & Reporting Features
+* **Full Visualization Dashboard**: Expanding the UI to include exhaustive reports and data breakdowns.
+* **Smart Notifications**: Proactive desktop alerts regarding productivity trends and time sinks.
+* **AI Assistant & Guider**: Help with tasks, scheduling, reminders, and projections regarding progress on the user's skill level.
+* **AI Controller**: An optional AI agent that can manage your PC environment dynamically based on your focus state.
 
 ---
 
 ## Technology Stack
-
-### Core System
-
-* Language: Python
-* Role: Background activity agent
-
-### Storage
-
-* JSON file 
-
-### API Layer
-
-* NULL
-
-### Desktop UI
-
-* Next + TypeScript
-* Packaged with Tauri
-
-### Distribution
-
-* Python packaged to EXE (PyInstaller)
-* Desktop app packaged as EXE
-
----
-
-## Safety & Privacy Rules
-
-* Local-only data storage
-* No cloud or network upload
-* No key content logging
-* No destructive system actions
-* Fully uninstallable
-
----
-
-## What This Phase Is NOT
-
-* No AI analysis
-* No skill scoring
-* No enforcement or blocking
-* No motivation logic
-
-This phase establishes **ground truth data** only.
-
----
-
-## Future Integration (Later Phases)
-
-* AI behavior pattern detection
-* Skill-based project analysis
-* Automatic discipline mode escalation
-* OS-level enforcement
-
----
-
-## One-Line Summary
-
-This product is a **desktop-based activity observability system** designed to measure real computer usage accurately and safely, serving as the foundation for future AI-driven discipline and skill monitoring.
+* **Background Agent**: Python (Packaged to EXE via PyInstaller).
+* **Desktop UI**: Next.js + TailwindCSS + ApexCharts.
+* **Application Shell**: Tauri (Rust IPC bridging).
+* **Storage**: Local JSON filesystem.
