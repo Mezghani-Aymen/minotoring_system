@@ -1,7 +1,8 @@
 import ctypes
 import win32gui, win32process, psutil
 from app.config.settings import AFK_THRESHOLD_SECONDS
-from utils.time_utils import current_date, current_time
+from utils.time_utils import  current_time
+from utils.date_utils import  current_date
 from app.infrastructure.window_utils import get_foreground_hwnd
 
 
