@@ -33,15 +33,20 @@ pub fn store_process(state: &State<'_, PythonState>, child: Child) {
 
 pub fn build_command(app: &AppHandle, is_dev: bool) -> Result<Command, String> {
     if is_dev {
-        let mut cmd = Command::new("python");
+        let mut cmd = Command::new("../backend/venv/Scripts/python.exe");
         cmd.arg("../backend/main.py");
         Ok(cmd)
     } else {
         let exe_path = app
             .path()
-            .resolve("backend/main.exe", tauri::path::BaseDirectory::Resource)
-            .map_err(|e| e.to_string())?;
+            .resolve("resources/backend/main.exe", tauri::path::BaseDirectory::Resource)
+            .map_err(|e| format!("Resource path error: {}", e))?;
 
-        Ok(Command::new(exe_path))
+        let mut cmd = Command::new(&exe_path);
+        if let Some(parent) = exe_path.parent() {
+            cmd.current_dir(parent);
+        }
+        
+        Ok(cmd)
     }
 }
