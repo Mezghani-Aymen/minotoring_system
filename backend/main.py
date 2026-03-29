@@ -22,7 +22,6 @@ if __name__ == "__main__":
     # TODO: Add notifications and alerts for user about productivity , time spent on certain apps/websites etc.
     # TODO: [Part league of legends] Add detection when user is in champion select / in game / in lobby etc. [optional].
 
-    # TODO: IMPORTANT ==> change the raw and agrregatd source file 
     date = current_date()
     RAW_FILE = RAW_FILE_PATH / get_filename("raw", date)
 
