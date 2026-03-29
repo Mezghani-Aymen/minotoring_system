@@ -51,7 +51,36 @@ pub fn run_python(app: AppHandle, state: State<'_, PythonState>) -> Result<Strin
         }
     };
 
-    // 7. Store
+    // 7. Capture pipes and start logging threads
+    use tauri::Emitter;
+
+    if let Some(stdout) = child.stdout.take() {
+        let app_handle = app.clone();
+        std::thread::spawn(move || {
+            use std::io::{BufRead, BufReader};
+            let reader = BufReader::new(stdout);
+            for line in reader.lines() {
+                if let Ok(l) = line {
+                    let _ = app_handle.emit("python-log", l);
+                }
+            }
+        });
+    }
+
+    if let Some(stderr) = child.stderr.take() {
+        let app_handle = app.clone();
+        std::thread::spawn(move || {
+            use std::io::{BufRead, BufReader};
+            let reader = BufReader::new(stderr);
+            for line in reader.lines() {
+                if let Ok(l) = line {
+                    let _ = app_handle.emit("python-log", format!("ERROR: {}", l));
+                }
+            }
+        });
+    }
+
+    // 8. Store
     store_process(&state, child);
 
     Ok("Monitoring System Started in Background".to_string())
