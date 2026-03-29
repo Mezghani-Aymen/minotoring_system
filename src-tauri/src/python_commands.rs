@@ -43,7 +43,13 @@ pub fn run_python(app: AppHandle, state: State<'_, PythonState>) -> Result<Strin
     set_envs(&mut cmd, is_dev, &base_path, &raw_path, &aggregated_path);
 
     // 6. Spawn
-    let child = spawn_process(&mut cmd)?;
+    let mut child = match spawn_process(&mut cmd) {
+        Ok(c) => c,
+        Err(e) => {
+            let _ = app.emit("python-log", format!("ERROR: Spawning failed: {}", e));
+            return Err(e);
+        }
+    };
 
     // 7. Store
     store_process(&state, child);
