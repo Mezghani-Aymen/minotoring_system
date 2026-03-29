@@ -1,3 +1,4 @@
+from pathlib import Path
 import time
 import os
 from app.config.settings import AFK_ALERT_SHOWN,  INTERVAL, RAW_FILE_PATH, AGGREGATED_FILE_PATH
@@ -8,7 +9,7 @@ from app.infrastructure.activity_collector import check_user_activity, collect_a
 from utils.date_utils import get_previous_day, current_date
 from utils.file_name_utils import get_filename
 from services.notification import notify
-
+        
 if __name__ == "__main__":
     # TODO: Add prodectivity detection, conception, analysis
     # TODO: Add background app monitoring (like youtube videos , music players etc)
@@ -23,11 +24,11 @@ if __name__ == "__main__":
 
     # TODO: IMPORTANT ==> change the raw and agrregatd source file 
     date = current_date()
-    RAW_FILE = RAW_FILE_PATH + get_filename("raw", date)
+    RAW_FILE = RAW_FILE_PATH / get_filename("raw", date)
 
     previous_date = get_previous_day(date)
-    previous_raw_file = RAW_FILE_PATH + get_filename("raw", previous_date)
-    expected_aggregated_file = AGGREGATED_FILE_PATH + get_filename("aggregated", previous_date)
+    previous_raw_file = RAW_FILE_PATH / get_filename("raw", previous_date)
+    expected_aggregated_file = AGGREGATED_FILE_PATH / get_filename("aggregated", previous_date)
 
     if os.path.exists(previous_raw_file) and not os.path.exists(expected_aggregated_file):
         add_aggregated_data(previous_raw_file, expected_aggregated_file)
@@ -39,12 +40,12 @@ if __name__ == "__main__":
                 previous_raw_file = RAW_FILE
 
                 previous_date = date
-                AGGREGATED_FILE = AGGREGATED_FILE_PATH + get_filename("aggregated", previous_date)
+                AGGREGATED_FILE = AGGREGATED_FILE_PATH / get_filename("aggregated", previous_date)
 
                 add_aggregated_data(previous_raw_file, AGGREGATED_FILE)
 
                 date = new_date
-                RAW_FILE = RAW_FILE_PATH + get_filename("raw", date)
+                RAW_FILE = RAW_FILE_PATH / get_filename("raw", date)
 
             AFK_status= check_user_activity()
 
@@ -69,7 +70,7 @@ if __name__ == "__main__":
                     continue
 
                 log_data = parse_log_line(parsed, monitor)
-                add_log_line(log_data,RAW_FILE )
+                add_log_line(log_data, str(RAW_FILE) )
 
                 time.sleep(INTERVAL)
             else :
