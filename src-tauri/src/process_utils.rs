@@ -19,7 +19,10 @@ pub fn check_and_cleanup_process(lock: &mut Option<Child>) -> bool {
 }
 
 pub fn spawn_process(cmd: &mut Command) -> Result<Child, String> {
-    cmd.spawn()
+    use std::process::Stdio;
+    cmd.stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
         .map_err(|e| format!("Failed to spawn process: {}", e))
 }
 
