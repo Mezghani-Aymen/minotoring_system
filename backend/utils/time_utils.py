@@ -1,23 +1,6 @@
 from datetime import datetime
 from app.config.settings import IDLE_THRESHOLD_SECONDS
-
-def now(format = "object"):
-    currentDateTime= datetime.now()
-
-    if format == "string":
-        return currentDateTime.strftime("%Y-%m-%d %H:%M:%S")
-    else:
-        return currentDateTime
-
-
-def current_date(format = "object"):
-    currentDate = now("object").date()
-
-    if format =="string":
-        return currentDate.strftime("%Y-%m-%d")
-    else:
-        return currentDate
-
+from utils.date_utils import now
 
 def current_time(format = "object"):
     currentTime = now("object").time()
@@ -72,3 +55,14 @@ def compute_activities_time(activities, idle_threshold=IDLE_THRESHOLD_SECONDS):
                 idle_threshold
             )
             value["total_time"] = seconds_to_hms(total_seconds)
+
+
+def parse_duration_to_seconds(time_str: str) -> int:
+    """Parses 'HH:MM:SS' string into total seconds."""
+    if not time_str:
+        return 0
+    try:
+        t = datetime.strptime(time_str, "%H:%M:%S")
+        return t.hour * 3600 + t.minute * 60 + t.second
+    except ValueError:
+        return 0
