@@ -1,6 +1,7 @@
 import json
-from app.core.activity_processing import extract_date_and_activities, date_entry_managment, merge_activities
+from app.core.activity_processing import aggregate_logs, extract_date_and_activities, date_entry_managment, merge_activities, normalize_raw_data
 from utils.time_utils import compute_activities_time
+import os
 
 def save_json_array(arr, file_path):
     arr.sort(key=lambda x: next(iter(x)))
@@ -25,3 +26,17 @@ def add_log_line(data, file_path):
     compute_activities_time(activities)
 
     save_json_array(arr, file_path)
+
+def  add_aggregated_data(SOURCE_FILE,DESTINATION_FILE):
+
+    if not os.path.exists(SOURCE_FILE):
+            return
+
+    raw_data = load_json_array(SOURCE_FILE)
+    if not raw_data:
+        return
+
+    cleaned_data = normalize_raw_data(raw_data)
+    final_result = aggregate_logs(cleaned_data)
+
+    save_json_array(final_result, DESTINATION_FILE )
