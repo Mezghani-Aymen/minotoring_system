@@ -1,29 +1,30 @@
 use crate::process_utils::{
-    build_command, check_and_cleanup_process, spawn_process, store_process,
+    build_command, is_process_running, store_process,
 };
-use std::process::Child;
 use std::sync::Mutex;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, State, Manager};
+use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 
 pub struct PythonState {
-    pub child: Mutex<Option<Child>>, // Option<Child> ==> {Return: Some(process) → Python is running / None → Python is NOT running}
+    pub child: Mutex<Option<CommandChild>>,
 }
 
 #[tauri::command]
 pub fn is_python_running(state: State<'_, PythonState>) -> bool {
-    let mut lock = state.child.lock().unwrap();
-    check_and_cleanup_process(&mut *lock)
+    let lock = state.child.lock().unwrap();
+    is_process_running(&*lock)
 }
 
 #[tauri::command]
 pub fn run_python(app: AppHandle, state: State<'_, PythonState>) -> Result<String, String> {
     use crate::env_utils::set_envs;
     use crate::file_utils::{ensure_directories, get_base_path, prepare_paths};
+    use tauri::Emitter;
 
     // 1. Check running
     {
-        let mut lock = state.child.lock().unwrap();
-        if check_and_cleanup_process(&mut *lock) {
+        let lock = state.child.lock().unwrap();
+        if is_process_running(&*lock) {
             return Ok("Monitoring System Already Running".to_string());
         }
     }
@@ -40,48 +41,46 @@ pub fn run_python(app: AppHandle, state: State<'_, PythonState>) -> Result<Strin
     let mut cmd = build_command(&app, is_dev)?;
 
     // 5. Env variables
-    set_envs(&mut cmd, is_dev, &base_path, &raw_path, &aggregated_path);
+    cmd = set_envs(cmd, is_dev, &base_path, &raw_path, &aggregated_path);
 
     // 6. Spawn
-    let mut child = match spawn_process(&mut cmd) {
+    let (mut rx, child) = match cmd.spawn() {
         Ok(c) => c,
         Err(e) => {
             let _ = app.emit("python-log", format!("ERROR: Spawning failed: {}", e));
-            return Err(e);
+            return Err(e.to_string());
         }
     };
 
-    // 7. Capture pipes and start logging threads
-    use tauri::Emitter;
-
-    if let Some(stdout) = child.stdout.take() {
-        let app_handle = app.clone();
-        std::thread::spawn(move || {
-            use std::io::{BufRead, BufReader};
-            let reader = BufReader::new(stdout);
-            for line in reader.lines() {
-                if let Ok(l) = line {
-                    let _ = app_handle.emit("python-log", l);
-                }
-            }
-        });
-    }
-
-    if let Some(stderr) = child.stderr.take() {
-        let app_handle = app.clone();
-        std::thread::spawn(move || {
-            use std::io::{BufRead, BufReader};
-            let reader = BufReader::new(stderr);
-            for line in reader.lines() {
-                if let Ok(l) = line {
-                    let _ = app_handle.emit("python-log", format!("ERROR: {}", l));
-                }
-            }
-        });
-    }
-
-    // 8. Store
+    // 7. Store
     store_process(&state, child);
+
+    // 8. Capture events
+    let app_handle = app.clone();
+    tauri::async_runtime::spawn(async move {
+        while let Some(event) = rx.recv().await {
+            match event {
+                CommandEvent::Stdout(line) => {
+                    let msg = String::from_utf8_lossy(&line).into_owned();
+                    let _ = app_handle.emit("python-log", msg);
+                }
+                CommandEvent::Stderr(line) => {
+                    let msg = String::from_utf8_lossy(&line).into_owned();
+                    let _ = app_handle.emit("python-log", format!("ERROR: {}", msg));
+                }
+                CommandEvent::Terminated(payload) => {
+                    let msg = format!("Process terminated with code: {:?}", payload.code);
+                    let _ = app_handle.emit("python-log", msg);
+                    
+                    if let Some(app_state) = app_handle.try_state::<PythonState>() {
+                        let mut lock = app_state.child.lock().unwrap();
+                        *lock = None;
+                    }
+                }
+                _ => {}
+            }
+        }
+    });
 
     Ok("Monitoring System Started in Background".to_string())
 }
