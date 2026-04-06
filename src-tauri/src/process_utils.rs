@@ -30,8 +30,17 @@ pub fn build_command(app: &AppHandle, is_dev: bool) -> Result<Command, String> {
 
 pub fn stop_python(_app_handle: &AppHandle, state: &State<'_, PythonState>) {
     let mut lock = state.child.lock().unwrap();
-    if let Some(mut child) = lock.take() {
+    if let Some(child) = lock.take() {
+        let pid = child.pid();
+        
+        #[cfg(target_os = "windows")]
+        {
+            let _ = std::process::Command::new("taskkill")
+                .args(&["/F", "/T", "/PID", &pid.to_string()])
+                .status();
+            log::info!("Python process tree {} stopped via taskkill.", pid);
+        }
+
         let _ = child.kill();
-        log::info!("Python process stopped via stop_python.");
     }
 }
